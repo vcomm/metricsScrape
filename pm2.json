@@ -1,0 +1,15 @@
+{
+    "apps": [{
+      "name": "target",
+      "script": "./index.js",
+      "instances": 2,
+      "exec_mode": "cluster",
+      "watch": true,
+      "instance_var": "INSTANCE_ID",
+      "increment_var" : "PORT",
+      "env": {
+          "PORT": 5000,
+          "NODE_ENV": "development"
+      }
+    }]
+  }

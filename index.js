@@ -5,7 +5,7 @@ const http = require('http');
 const app = express();
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 app.use(express.static(__dirname+'/public')); 
 const server = http.createServer(app);
@@ -46,12 +46,12 @@ app.get('/events/', function (req, res) {
 
 setInterval(function () {
     //let msg = Math.random();
-    let msg = JSON.stringify(process.memoryUsage())
-	console.log("Clients: " + Object.keys(clients) + " <- " + msg);
+    let msg = `${process.env.INSTANCE_ID}<${JSON.stringify(process.memoryUsage())}>`
+//	console.log(process.env.INSTANCE_ID+" Clients: " + Object.keys(clients) + " <- " + msg);
 	for (clientId in clients) {
 		clients[clientId].write("data: " + msg + "\n\n"); // <- Push a message to a single attached client
 	};
-}, 2000);
+}, 100);
 
 server.listen(PORT, (err) => {
     if (err) {
