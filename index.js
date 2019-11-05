@@ -1,5 +1,6 @@
 'use strict';
 
+const EventEmitter = require('events');
 const express = require('express');
 const http = require('http');
 const app = express();
@@ -27,6 +28,12 @@ app.get('/', function (req, res) {
 let clientId = 0;
 let clients = {}; // <- Keep a map of attached clients
 
+const Stream = new EventEmitter(); 
+Stream.on("push", (id, data) => {
+	//console.log(`Client ID: ${id}`)
+	clients[id].write("data: " + JSON.stringify(data) + "\n\n");
+});
+
 // Called once for each new client. Note, this response is left open!
 app.get('/events/', function (req, res) {
 	//req.socket.setTimeout(Number.MAX_VALUE);
@@ -42,16 +49,18 @@ app.get('/events/', function (req, res) {
 			delete clients[clientId]
 		}); // <- Remove this client when he disconnects
 	})(++clientId)
+
 });
 
 setInterval(function () {
     //let msg = Math.random();
-    let msg = `${process.env.INSTANCE_ID}<${JSON.stringify(process.memoryUsage())}>`
+    const msg = `${process.env.INSTANCE_ID}<${JSON.stringify(process.memoryUsage())}>`
 //	console.log(process.env.INSTANCE_ID+" Clients: " + Object.keys(clients) + " <- " + msg);
 	for (clientId in clients) {
-		clients[clientId].write("data: " + msg + "\n\n"); // <- Push a message to a single attached client
+		Stream.emit("push", clientId, { msg: {id: process.env.INSTANCE_ID,memory:process.memoryUsage()} });
+//		clients[clientId].write("data: " + msg + "\n\n"); // <- Push a message to a single attached client
 	};
-}, 100);
+}, 3000);
 
 server.listen(PORT, (err) => {
     if (err) {

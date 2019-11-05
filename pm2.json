@@ -2,7 +2,7 @@
     "apps": [{
       "name": "target",
       "script": "./index.js",
-      "instances": 2,
+      "instances": 4,
       "exec_mode": "cluster",
       "watch": true,
       "instance_var": "INSTANCE_ID",
